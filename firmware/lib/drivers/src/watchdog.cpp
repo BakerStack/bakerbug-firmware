@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 Daniel Flemström <daniel@flemstrom.nu>
+
 #include <drivers/watchdog.h>
 #include <bsp/gpio.h>
 #include <bsp/sleep.h>

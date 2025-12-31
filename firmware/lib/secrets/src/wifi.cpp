@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025 Daniel Flemström <daniel@flemstrom.nu>
+
 #include <secrets/wifi.h>
 #ifndef BBWIFI_SSID
 #define BBWIFI_SSID "default_ssid"  // fallback value
