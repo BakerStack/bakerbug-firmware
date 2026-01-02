@@ -18,7 +18,15 @@
 #define BB_MQTT_BROKER_NAME "local_broker"
 #endif
 
-#ifdef BB_MQTT_USE_TLS
+#ifndef BB_MQTT_USE_TLS
+#error "BB_MQTT_USE_TLS must be defined to 0 or 1"
+#endif
+
+#if BB_MQTT_USE_TLS != 0 && BB_MQTT_USE_TLS != 1
+#error "BB_MQTT_USE_TLS must be 0 or 1"
+#endif
+
+#if BB_MQTT_USE_TLS
 #include <bsp/tls.h>
 extern const tls_trust_bundle MQTT_TRUST;
 #endif // BB_MQTT_USE_TLS
