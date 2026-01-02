@@ -3,6 +3,13 @@
 VENV := .venv
 PIP  := $(VENV)/bin/pip
 PIO  := $(abspath $(VENV)/bin/pio)
+APPS_DIR := firmware/apps/examples
+APPS := $(shell ls $(APPS_DIR) 2>/dev/null)
+YELLOW := \033[33m
+GREEN  := \033[32m
+RED    := \033[31m
+BOLD   := \033[1m
+RESET  := \033[0m
 
 
 # --------------------------------------------------------------------
@@ -11,15 +18,31 @@ help:
 	@echo " Firmware orchestration"
 	@echo "--------------------------------------------------"
 	@echo " init              - Create venv and install tools"
-	@echo " set-dev-env       - Generate .env for DEV"
-	@echo " set-prod-env      - Generate .env for PROD"
+
 	@echo " certs             - Build TLS cert C++ files"
-	@echo " build             - Compile firmware"
 	@echo " upload            - Flash firmware"
 	@echo " serial            - Open device serial console"
 	@echo " dev               - set-dev-env + certs + upload"
 	@echo " prod              - set-prod-env + certs + upload"
-	@echo "--------------------------------------------------"
+	@echo " clean             - Clean build files"
+	@echo " supa-clean        - Clean all generated files (expert mode!)"
+
+	@echo "--------- Example Applications -------------------"
+
+	@echo " Applications (use via BB_APPLICATION=...):"
+	@for app in $(APPS); do \
+		echo "make BB_APPLICATION=applications/examples/$$app build"; \
+	done
+
+# --------------------------------------------------------------------
+# Check that BB_APPLICATION is set
+ifndef BB_APPLICATION
+$(error BB_APPLICATION is not set. Please set it to the application path, e.g., applications/examples/mqtt_basic_tls)
+endif	
+# Check that firmware/.env files exist
+ifneq ($(wildcard firmware/$(BB_APPLICATION)/dev.env),firmware/$(BB_APPLICATION)/dev.env)
+$(error firmware/$(BB_APPLICATION)/dev.env file not found)
+endif
 
 # --------------------------------------------------------------------
 # Python toolchain
@@ -32,12 +55,24 @@ init: $(VENV)
 
 # --------------------------------------------------------------------
 # Environment switching
+# Secrets are injected via envsubst. They should be defined in
+# dev.env and prod.env files located in the application directory.
+# All that is set from the serets.sh file that you should customize and
+# NOT check into git. This is VERY important for security.
 # --------------------------------------------------------------------
-set-dev-env:
-	envsubst < tools/dev.env > firmware/.env
+_iternal_set-dev-env:
+	@echo "\n ------------------------------------------------"
+	@echo " $(BOLD)$(GREEN)Environment:$(RESET)$(YELLOW)[firmware/$(BB_APPLICATION)/dev.env]$(RESET)"
+	@echo " ------------------------------------------------"
+	@cat firmware/$(BB_APPLICATION)/dev.env
+	envsubst < firmware/$(BB_APPLICATION)/dev.env > firmware/.env
 
-set-prod-env:
-	envsubst < tools/prod.env > firmware/.env
+_iternal_set-prod-env:
+	@echo " ------------------------------------------------"
+	@echo " $(BOLD)$(GREEN)Environment:$(RESET)$(YELLOW)[firmware/$(BB_APPLICATION)/prod.env]$(RESET)"
+	@echo " ------------------------------------------------"
+	@cat firmware/$(BB_APPLICATION)/prod.env
+	envsubst < firmware/$(BB_APPLICATION)/prod.env > firmware/.env
 
 # --------------------------------------------------------------------
 # Certificates
@@ -48,7 +83,11 @@ certs:
 # --------------------------------------------------------------------
 # Build (compile only)
 # --------------------------------------------------------------------
-build: init certs
+_iternal_build: init certs
+	@echo " ------------------------------------------------"
+	@echo "  $(BOLD)$(GREEN)Building application: $(RESET)$(YELLOW)$(BB_APPLICATION)$(RESET)"
+	@echo " ------------------------------------------------"
+	@echo ""
 	cd firmware && \
 	bash -c 'set -a && source .env && set +a && \
 	$(PIO) run'
@@ -62,8 +101,8 @@ serial:
 	cd firmware && $(PIO) device monitor
 
 # --------------------------------------------------------------------
-dev: set-dev-env upload
-prod: set-prod-env upload
+dev: _iternal_set-dev-env _iternal_build
+prod: _iternal_set-prod-env _iternal_build
 
 # --------------------------------------------------------------------
 clean:
