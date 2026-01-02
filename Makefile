@@ -105,7 +105,7 @@ upload: init certs
 	$(PIO) run -e $(BB_ARCH) -t upload'
 
 serial:
-	cd firmware && $(PIO)  -e $(BB_ARCH) device monitor
+	cd firmware && $(PIO) device monitor
 
 # --------------------------------------------------------------------
 dev: _iternal_set-dev-env _iternal_build
