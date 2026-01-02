@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2025 Daniel Flemström <daniel@flemstrom.nu>
 
-#ifdef CONFIG_ARCH_ESP8266
-
 #include <Arduino.h>
 #include <bsp/gpio.h>
 
@@ -83,5 +81,3 @@ void bsp_gpio_detach_interrupt(const bsp_gpio_t* gpio)
     irq_handlers[gpio->pin] = nullptr;
     irq_args[gpio->pin] = nullptr;
 }
-
-#endif

@@ -39,6 +39,9 @@ help:
 ifndef BB_APPLICATION
 $(error BB_APPLICATION is not set. Please set it to the application path, e.g., applications/examples/mqtt_basic_tls)
 endif	
+ifndef BB_ARCH
+$(error BB_APPLICATION is not set. Please set it to the application path, e.g., applications/examples/mqtt_basic_tls)
+endif	
 # Check that firmware/.env files exist
 ifneq ($(wildcard firmware/$(BB_APPLICATION)/dev.env),firmware/$(BB_APPLICATION)/dev.env)
 $(error firmware/$(BB_APPLICATION)/dev.env file not found)
@@ -63,6 +66,8 @@ init: $(VENV)
 _iternal_set-dev-env:
 	@echo "\n ------------------------------------------------"
 	@echo " $(BOLD)$(GREEN)Environment:$(RESET)$(YELLOW)[firmware/$(BB_APPLICATION)/dev.env]$(RESET)"
+	@echo " $(BOLD)$(GREEN)Architecture:$(RESET)$(YELLOW)[$(BB_ARCH)]$(RESET)"
+	
 	@echo " ------------------------------------------------"
 	@cat firmware/$(BB_APPLICATION)/dev.env
 	envsubst < firmware/$(BB_APPLICATION)/dev.env > firmware/.env
@@ -70,6 +75,8 @@ _iternal_set-dev-env:
 _iternal_set-prod-env:
 	@echo " ------------------------------------------------"
 	@echo " $(BOLD)$(GREEN)Environment:$(RESET)$(YELLOW)[firmware/$(BB_APPLICATION)/prod.env]$(RESET)"
+	@echo " $(BOLD)$(GREEN)Architecture:$(RESET)$(YELLOW)[$(BB_ARCH)]$(RESET)"
+
 	@echo " ------------------------------------------------"
 	@cat firmware/$(BB_APPLICATION)/prod.env
 	envsubst < firmware/$(BB_APPLICATION)/prod.env > firmware/.env
@@ -78,7 +85,7 @@ _iternal_set-prod-env:
 # Certificates
 # --------------------------------------------------------------------
 certs:
-	$(MAKE) -C tools/certs
+	$(MAKE) -C tools/certs all
 
 # --------------------------------------------------------------------
 # Build (compile only)
@@ -90,15 +97,15 @@ _iternal_build: init certs
 	@echo ""
 	cd firmware && \
 	bash -c 'set -a && source .env && set +a && \
-	$(PIO) run'
+	$(PIO) run -e $(BB_ARCH)'
 
 upload: init certs
 	cd firmware && \
 	bash -c 'set -a && source .env && set +a && \
-	$(PIO) run -t upload'
+	$(PIO) run -e $(BB_ARCH) -t upload'
 
 serial:
-	cd firmware && $(PIO) device monitor
+	cd firmware && $(PIO)  -e $(BB_ARCH) device monitor
 
 # --------------------------------------------------------------------
 dev: _iternal_set-dev-env _iternal_build
@@ -107,7 +114,7 @@ prod: _iternal_set-prod-env _iternal_build
 # --------------------------------------------------------------------
 clean:
 	$(MAKE) -C tools/certs clean
-	cd firmware && $(PIO) run --target clean
+	cd firmware && $(PIO) run  -e $(BB_ARCH) --target clean
 
 supa-clean: clean
 	rm -rf .venv

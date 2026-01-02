@@ -1,8 +1,8 @@
 {
-  "name": "bsp",
+  "name": "bsp-esp32",
   "version": "1.0.0",
   "build": {
-    "includeDir": "include",
+    "includeDir": "../include",
     "srcDir": "."
   }
 }

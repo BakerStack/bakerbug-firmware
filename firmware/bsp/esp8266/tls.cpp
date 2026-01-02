@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2025 Daniel Flemström <daniel@flemstrom.nu>
 
-#ifdef CONFIG_ARCH_ESP8266
-
 #include <WiFiClientSecureBearSSL.h>
 #include <bsp/tls.h>
 #include <bsp/log.h>
@@ -31,5 +29,3 @@ Client* bsp_tls_client()
     log_printf(LOG_LEVEL_DEBUG, "Fetching TLS client");    
     return &tls_client;
 }
-    
-#endif
