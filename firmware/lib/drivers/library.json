@@ -1,0 +1,18 @@
+{
+  "name": "drivers",
+  "version": "1.0.0",
+  "description": "BakerStack reusable hardware drivers (sensors, actuators)",
+  "build": {
+    "includeDir": "include",
+    "srcDir": "src",
+    "srcFilter": [
+      "+<*>",
+      "-<scd41.cpp>",
+      "-<watchdog.cpp>"
+    ]
+  },
+  "dependencies": [
+    "paulstoffregen/OneWire@^2.3.8",
+    "milesburton/DallasTemperature@^3.11.0"
+  ]
+}
