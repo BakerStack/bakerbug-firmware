@@ -7,6 +7,8 @@
 namespace drivers {
 
 // PWM fan output: percent setpoint with ramped slew rate.
+// Call fan_control_force_off() as the first line of setup() — before Serial/WiFi.
+void fan_control_force_off(uint8_t pwm_pin);
 void fan_control_init(uint8_t pwm_pin, uint32_t ramp_interval_ms, uint8_t ramp_step_percent,
                       uint32_t pwm_hz);
 void fan_control_set_new_setpoint(int percent_0_100);

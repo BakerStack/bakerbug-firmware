@@ -38,6 +38,12 @@ void write_pwm_percent(int pct)
 
 }  // namespace
 
+void fan_control_force_off(uint8_t pwm_pin)
+{
+    pinMode(pwm_pin, OUTPUT);
+    digitalWrite(pwm_pin, LOW);
+}
+
 void fan_control_init(uint8_t pwm_pin, uint32_t ramp_interval_ms, uint8_t ramp_step_percent,
                       uint32_t pwm_hz)
 {
@@ -45,7 +51,7 @@ void fan_control_init(uint8_t pwm_pin, uint32_t ramp_interval_ms, uint8_t ramp_s
     g_ramp_interval_ms = ramp_interval_ms;
     g_ramp_step_pct = ramp_step_percent > 0 ? ramp_step_percent : 1;
 
-    pinMode(g_pwm_pin, OUTPUT);
+    fan_control_force_off(g_pwm_pin);
     analogWriteRange(FAN_PWM_MAX);
     analogWriteFreq(pwm_hz);
 
